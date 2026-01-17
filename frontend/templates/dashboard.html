@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600">MyShop</h1>
+            <div class="flex items-center gap-4 text-sm">
+                <span class="text-gray-600 hidden sm:block">Hi, {{ user.name }}</span>
+                <a href="{{ url_for('cart.view_cart') }}" class="hover:text-blue-500">Cart</a>
+                <a href="{{ url_for('order.view_my_orders') }}" class="hover:text-blue-500">Orders</a>
+                <a href="{{ url_for('auth.logout') }}" class="text-red-500 hover:underline">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center sm:text-left">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-2">Welcome, {{ user.name }} 👋</h2>
+            <p class="text-lg opacity-90">Explore and shop from our latest collections</p>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="max-w-7xl mx-auto px-6 py-10">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-800">Categories</h3>
+            <a href="{{ url_for('category.list_categories') }}" class="text-blue-500 hover:underline text-sm">
+                View all
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+            {% for category in categories %}
+            <a href="{{ url_for('product.list_products', category=category.name) }}"
+                class="bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex flex-col items-center justify-center">
+                <div
+                    class="h-20 w-20 mb-3 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                    {{ category.name[0] }}
+                </div>
+                <p class="font-semibold text-gray-800 text-center">{{ category.name }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="max-w-7xl mx-auto px-6 pb-12">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-800">Featured Products</h3>
+            <a href="{{ url_for('product.list_products') }}" class="text-blue-500 hover:underline text-sm">
+                View all
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for product in products %}
+            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition flex flex-col">
+
+                <!-- Image Placeholder -->
+                <div class="h-44 bg-gray-200 rounded-t-2xl flex items-center justify-center text-gray-400">
+                    Image
+                </div>
+
+                <div class="p-4 flex flex-col flex-1">
+                    <h4 class="font-semibold text-lg text-gray-800">{{ product.name }}</h4>
+                    <p class="text-sm text-gray-500 mb-2">{{ product.category }}</p>
+                    <p class="text-blue-600 font-bold mb-2">$ {{ product.price }}</p>
+
+                    {% if product.stock > 0 %}
+                    <span class="text-xs text-green-600 mb-2">In stock</span>
+                    {% else %}
+                    <span class="text-xs text-red-600 mb-2">Out of stock</span>
+                    {% endif %}
+
+                    <div class="mt-auto flex flex-col gap-2">
+                        {% if product.stock > 0 %}
+                        <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}">
+                            <button type="submit"
+                                class="w-full bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 font-medium transition">
+                                Add to Cart
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <a href="{{ url_for('product.view_product', product_id=product.id) }}"
+                            class="w-full text-center text-blue-500 hover:underline font-medium">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</body>
+
+</html>

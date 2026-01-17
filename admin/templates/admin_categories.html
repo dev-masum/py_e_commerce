@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Categories</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-3xl font-bold mb-6">Categories</h1>
+
+        <!-- Add Category Button -->
+        <div class="mb-4">
+            <a href="{{ url_for('category.add_category') }}"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add New Category</a>
+        </div>
+
+        {% if categories %}
+        <table class="table-auto w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border px-4 py-2">ID</th>
+                    <th class="border px-4 py-2">Name</th>
+                    <th class="border px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr class="hover:bg-gray-100">
+                    <td class="border px-4 py-2">{{ category.id }}</td>
+                    <td class="border px-4 py-2">{{ category.name }}</td>
+                    <td class="border px-4 py-2 flex gap-2">
+                        <a href="#" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</a>
+                        <a href="{{ url_for('category.delete_category', category_id=category.id) }}"
+                            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No categories found.</p>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+
+    <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-3xl font-bold mb-6">Products</h1>
+
+        <!-- Add Product Button -->
+        <div class="mb-4">
+            <a href="{{ url_for('product.add_product') }}"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add New Product</a>
+        </div>
+
+        {% if products %}
+        <table class="table-auto w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border px-4 py-2">ID</th>
+                    <th class="border px-4 py-2">Name</th>
+                    <th class="border px-4 py-2">Price</th>
+                    <th class="border px-4 py-2">Stock</th>
+                    <th class="border px-4 py-2">Category</th>
+                    <th class="border px-4 py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr class="hover:bg-gray-100">
+                    <td class="border px-4 py-2">{{ product.id }}</td>
+                    <td class="border px-4 py-2">{{ product.name }}</td>
+                    <td class="border px-4 py-2">$ {{ product.price }}</td>
+                    <td class="border px-4 py-2">{{ product.stock }}</td>
+                    <td class="border px-4 py-2">{{ product.category_name or product.category }}</td>
+                    <td class="border px-4 py-2 flex gap-2">
+                        <a href="#" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Edit</a>
+                        <a href="{{ url_for('product.delete_product', product_id=product.id) }}"
+                            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No products found.</p>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>

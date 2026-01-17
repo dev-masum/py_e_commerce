@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+
+    <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-3xl font-bold mb-6">Orders</h1>
+
+        {% if orders %}
+        <table class="table-auto w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border px-4 py-2">Order ID</th>
+                    <th class="border px-4 py-2">User</th>
+                    <th class="border px-4 py-2">Products</th>
+                    <th class="border px-4 py-2">Total Price</th>
+                    <th class="border px-4 py-2">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr class="hover:bg-gray-100">
+                    <td class="border px-4 py-2">{{ order.id }}</td>
+                    <td class="border px-4 py-2">{{ order.user_name or order.user_email }}</td>
+                    <td class="border px-4 py-2">
+                        {% for item in order.products %}
+                        {{ item.product_name }} x {{ item.quantity }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="border px-4 py-2">$ {{ order.total_price }}</td>
+                    <td class="border px-4 py-2">{{ order.status or "Pending" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No orders found.</p>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
