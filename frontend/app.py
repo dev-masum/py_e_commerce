@@ -27,20 +27,30 @@ def dashboard():
     if not user:
         return redirect(url_for("auth.login"))
 
+    BASE_URL = "http://127.0.0.1:5000"  # backend base URL
+
     try:
         # Fetch categories
-        resp_cat = requests.get(f"{BACKEND_URL}/categories/")
+        resp_cat = requests.get(f"{BASE_URL}/categories/")
         categories = resp_cat.json().get("data", [])
 
         # Fetch products
-        resp_prod = requests.get(f"{BACKEND_URL}/products/")
+        resp_prod = requests.get(f"{BASE_URL}/products/")
         products = resp_prod.json().get("data", [])
 
-    except:
+        # Prepend base URL to image_url if exists
+        for p in products:
+            if p.get("image_url"):
+                if not p["image_url"].startswith("http"):
+                    p["image_url"] = BASE_URL + p["image_url"]
+
+    except Exception as e:
+        print("Error fetching dashboard data:", e)
         categories = []
         products = []
 
     return render_template("dashboard.html", user=user, categories=categories, products=products)
+
 
 
 # ---------------------------

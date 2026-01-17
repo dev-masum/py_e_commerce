@@ -4,6 +4,7 @@ from .category_routes import category_bp
 from .cart_routes import cart_bp
 from .order_routes import order_bp
 from .admin_auth_routes import admin_auth_bp
+from .image_routes import image_bp
 
 def register_routes(app):
     app.register_blueprint(user_auth_bp, url_prefix="/auth/user")
@@ -12,4 +13,5 @@ def register_routes(app):
     app.register_blueprint(category_bp, url_prefix="/categories")
     app.register_blueprint(cart_bp, url_prefix="/cart")
     app.register_blueprint(order_bp, url_prefix="/orders")
+    app.register_blueprint(image_bp, url_prefix="/images")
 

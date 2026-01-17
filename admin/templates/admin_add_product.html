@@ -13,19 +13,27 @@
     <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-2xl font-bold mb-6">Add New Product</h1>
 
-        <form method="POST" class="space-y-4">
+        {% if error %}
+        <p class="text-red-500 mb-4">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+
             <div>
                 <label class="block font-medium">Name</label>
                 <input type="text" name="name" required class="w-full border px-3 py-2 rounded">
             </div>
+
             <div>
                 <label class="block font-medium">Price</label>
                 <input type="number" step="0.01" name="price" required class="w-full border px-3 py-2 rounded">
             </div>
+
             <div>
                 <label class="block font-medium">Stock</label>
                 <input type="number" name="stock" required class="w-full border px-3 py-2 rounded">
             </div>
+
             <div>
                 <label class="block font-medium">Category</label>
                 <select name="category_id" class="w-full border px-3 py-2 rounded" required>
@@ -34,8 +42,22 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add
-                Product</button>
+
+            <div>
+                <label class="block font-medium">Description</label>
+                <textarea name="description" rows="4" class="w-full border px-3 py-2 rounded"
+                    placeholder="Enter product description"></textarea>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1">Product Image</label>
+                <input type="file" name="image_file" class="w-full" accept="image/*">
+            </div>
+
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Add Product
+            </button>
+
         </form>
     </div>
 

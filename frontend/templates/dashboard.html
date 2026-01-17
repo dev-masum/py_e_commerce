@@ -66,11 +66,20 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for product in products %}
             <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition flex flex-col">
+                <script>
+                    console.log("Product image URL:", "{{ product.image_url }}");
+                </script>
+
 
                 <!-- Image Placeholder -->
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}"
+                    class="h-44 w-full object-cover rounded-t-2xl">
+                {% else %}
                 <div class="h-44 bg-gray-200 rounded-t-2xl flex items-center justify-center text-gray-400">
-                    Image
+                    No Image
                 </div>
+                {% endif %}
 
                 <div class="p-4 flex flex-col flex-1">
                     <h4 class="font-semibold text-lg text-gray-800">{{ product.name }}</h4>

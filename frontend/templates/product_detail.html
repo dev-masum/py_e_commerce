@@ -33,10 +33,14 @@
 
         <!-- Left: Image -->
         <div class="flex-1">
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="h-96 w-full object-cover rounded-2xl">
+            {% else %}
             <div
                 class="h-96 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 text-2xl font-semibold">
-                Image Placeholder
+                No Image
             </div>
+            {% endif %}
         </div>
 
         <!-- Right: Product Info -->

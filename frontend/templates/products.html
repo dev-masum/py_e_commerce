@@ -29,10 +29,14 @@
 
                 <a href="{{ url_for('product.view_product', product_id=product.id) }}" class="flex-1 flex flex-col">
 
-                    <!-- Image Placeholder -->
+                    <!-- Product Image -->
+                    {% if product.image_url %}
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="h-48 w-full object-cover">
+                    {% else %}
                     <div class="h-48 bg-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold">
-                        Image
+                        No Image
                     </div>
+                    {% endif %}
 
                     <!-- Product Info -->
                     <div class="p-4 flex-1 flex flex-col justify-between">
