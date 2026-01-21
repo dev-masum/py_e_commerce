@@ -21,10 +21,17 @@
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">My Orders</h1>
 
-                    <div class="flex items-center gap-3">
-                        <input id="orders-search" name="q" type="search" placeholder="Search orders or items"
-                            value="{{ request.args.get('q','') }}"
-                            class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-200 w-72 bg-white">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+                        <div class="flex items-center gap-3">
+                            <input id="orders-search" name="q" type="search" placeholder="Search orders or items"
+                                value="{{ request.args.get('q','') }}"
+                                class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-200 w-72 bg-white">
+                        </div>
+
+                        <a href="{{ url_for('dashboard') }}"
+                            class="text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-3 rounded-lg font-medium">Continue
+                            shopping</a>
                     </div>
                 </div>
 
