@@ -1,6 +1,5 @@
 from flask import Flask, session, redirect, url_for, render_template
 from modules.auth_module import auth_bp
-from modules.category_module import category_bp
 from modules.product_module import product_bp
 from modules.cart_module import cart_bp
 from modules.order_module import order_bp
@@ -13,7 +12,6 @@ BACKEND_URL = "http://127.0.0.1:5000"
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix="/auth")
-app.register_blueprint(category_bp, url_prefix="/categories")
 app.register_blueprint(product_bp, url_prefix="/products")
 app.register_blueprint(cart_bp, url_prefix="/cart")
 app.register_blueprint(order_bp, url_prefix="/orders")
