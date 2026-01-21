@@ -8,78 +8,178 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-50 min-h-screen py-10 px-4">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <div class="max-w-6xl mx-auto">
 
-        <!-- Page Title -->
-        <h1 class="text-5xl font-extrabold text-gray-900 mb-10 text-center">My Orders</h1>
 
-        <!-- Messages -->
-        {% if message %}
-        <p class="text-green-600 text-center mb-6 font-medium">{{ message }}</p>
-        {% endif %}
-        {% if error %}
-        <p class="text-red-600 text-center mb-6 font-medium">{{ error }}</p>
-        {% endif %}
+    <main class="flex-1 py-10 px-4">
 
-        {% if orders %}
-        <div class="space-y-8">
+        <div class="max-w-7xl mx-auto px-6">
 
-            {% for order in orders %}
-            <div class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition p-6">
+            <!-- Page Title + Toolbar -->
+            <div class="mb-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">My Orders</h1>
 
-                <!-- Order Header -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
-                    <h2 class="font-bold text-xl text-gray-800">Order #{{ order.id }}</h2>
-                    <p class="text-gray-500 text-sm">{{ order.created_at }}</p>
-                </div>
-
-                <!-- Products List -->
-                <div class="border-t border-gray-200 pt-4 space-y-4">
-                    {% for item in order.products %}
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <p class="text-gray-700 font-medium">{{ item.product_name }} × {{ item.quantity }}</p>
-                        <p class="text-gray-800 font-semibold">$ {{ (item.quantity * item.price)|float }}</p>
+                    <div class="flex items-center gap-3">
+                        <input id="orders-search" name="q" type="search" placeholder="Search orders or items"
+                            value="{{ request.args.get('q','') }}"
+                            class="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-200 w-72 bg-white">
                     </div>
-                    {% endfor %}
                 </div>
 
-                <!-- Order Total -->
-                <div class="border-t border-gray-200 pt-4 mt-4 flex justify-end">
-                    <p class="text-xl font-bold text-blue-600">Total: $ {{ order.total_price|float }}</p>
+                {% if message %}
+                <p class="text-green-600 mt-4 font-medium">{{ message }}</p>
+                {% endif %}
+                {% if error %}
+                <p class="text-red-600 mt-4 font-medium">{{ error }}</p>
+                {% endif %}
+            </div>
+
+            {% if orders %}
+
+            <!-- Summary Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-4 shadow">
+                    <p class="text-sm text-gray-500">Total Orders</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ orders|length }}</p>
                 </div>
-
+                <div class="bg-white rounded-xl p-4 shadow">
+                    <p class="text-sm text-gray-500">Total Spent</p>
+                    <p id="total-spent" class="text-2xl font-bold text-gray-900">$0.00</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow hidden sm:block">
+                    <p class="text-sm text-gray-500">Latest Order</p>
+                    <p class="text-gray-900 font-semibold">{{ orders[0].created_at if orders[0] is defined else '-' }}
+                    </p>
+                </div>
             </div>
-            {% endfor %}
 
-        </div>
+            <!-- Orders Grid -->
+            <div class="grid gap-8 md:grid-cols-2">
+                {% for order in orders %}
+                <article class="order-card bg-white rounded-2xl shadow p-8 hover:shadow-xl transition"
+                    data-order-id="{{ order.id }}">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="h-14 w-14 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold">
+                                #{{ order.id }}
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Order #{{ order.id }}</h3>
+                                <p class="text-sm text-gray-500">Placed on {{ order.created_at }}</p>
+                            </div>
+                        </div>
 
-        <!-- Back Button -->
-        <div class="mt-12 text-center">
-            <a href="{{ url_for('dashboard') }}"
-                class="inline-block bg-blue-100 text-blue-700 px-8 py-3 rounded-xl hover:bg-blue-200 font-semibold transition">
-                ← Back to Shop
-            </a>
-        </div>
+                        <div class="text-right flex flex-col items-end gap-2">
+                            <p class="text-xl font-bold text-blue-600 order-total"
+                                data-total="{{ order.total_price|float }}">$ {{ "%.2f"|format(order.total_price|float)
+                                }}</p>
+                        </div>
+                    </div>
 
-        {% else %}
-        <!-- Empty State -->
-        <div class="flex flex-col items-center justify-center mt-20">
-            <div
-                class="h-40 w-40 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-6xl font-bold mb-6">
-                🛍️
+                    <div class="mt-5 border-t border-gray-100 pt-5">
+                        <ul class="space-y-3">
+                            {% for item in order.products %}
+                            <li class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    {% if item.image or item.image_url %}
+                                    <img src="{{ item.image or item.image_url }}" alt="{{ item.product_name }}"
+                                        class="h-12 w-12 rounded-md object-cover bg-gray-50">
+                                    {% else %}
+                                    <div
+                                        class="h-12 w-12 rounded-md bg-gray-100 flex items-center justify-center text-gray-400">
+                                        📦</div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800">{{ item.product_name }}</p>
+                                        <p class="text-xs text-gray-500">Qty {{ item.quantity }} · $ {{
+                                            "%.2f"|format(item.price|float) }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right text-sm text-gray-700 font-semibold">$ {{
+                                    "%.2f"|format((item.quantity|float * item.price|float)) }}</div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="mt-5 flex items-center justify-between">
+                        <div class="text-sm text-gray-500">Items: {{ order.products|length }}</div>
+                    </div>
+                </article>
+                {% endfor %}
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">No orders found</h2>
-            <p class="text-gray-600 text-center mb-6">You haven’t placed any orders yet.</p>
-            <a href="{{ url_for('dashboard') }}"
-                class="bg-blue-100 text-blue-700 px-8 py-3 rounded-xl hover:bg-blue-200 font-semibold transition">
-                ← Back to Shop
-            </a>
-        </div>
-        {% endif %}
 
-    </div>
+            {% else %}
+
+            <!-- Empty State (modern) -->
+            <div class="flex flex-col items-center justify-center mt-20">
+                <div
+                    class="h-40 w-40 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center text-blue-600 text-5xl font-bold mb-6">
+                    🛍️</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">No orders yet</h2>
+                <p class="text-gray-600 text-center mb-6">You haven’t placed any orders. Start shopping now!</p>
+                <a href="{{ url_for('dashboard') }}"
+                    class="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700">Browse
+                    products</a>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+    <footer class="bg-gradient-to-r from-white to-blue-50 border-t">
+        <div class="max-w-[1400px] mx-auto px-6 py-6 text-sm text-gray-600">© {{ current_year or "2026" }} MyShop —
+            Built with care.</div>
+    </footer>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function computeTotal() {
+            var total = 0;
+            document.querySelectorAll('.order-total[data-total]').forEach(function (el) {
+                var orderCard = el.closest('.order-card');
+                if (!orderCard) return;
+                // check visibility
+                if (orderCard.offsetParent === null) return;
+                var v = parseFloat(el.getAttribute('data-total'));
+                if (!isNaN(v)) total += v;
+            });
+            var out = document.getElementById('total-spent');
+            if (out) out.textContent = '$ ' + total.toFixed(2);
+        }
+
+        function filterOrders(query) {
+            query = (query || '').trim().toLowerCase();
+            var cards = document.querySelectorAll('.order-card');
+            cards.forEach(function (card) {
+                var text = card.textContent.toLowerCase();
+                if (!query || text.indexOf(query) !== -1) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            computeTotal();
+        }
+
+        var input = document.getElementById('orders-search');
+        if (input) {
+            // initialize filter from input value
+            filterOrders(input.value || '');
+            input.addEventListener('input', function (e) {
+                filterOrders(e.target.value);
+            });
+        } else {
+            computeTotal();
+        }
+    });
+</script>
 
 </body>
 

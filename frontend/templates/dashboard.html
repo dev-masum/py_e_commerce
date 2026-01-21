@@ -1,93 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyShop Dashboard</title>
+    <title>MyShop — Products</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* small polish for consistent card heights */
+        .product-card .card-media {
+            height: 220px;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-[1400px] mx-auto px-8 py-4 flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold text-blue-600 tracking-tight">MyShop</h1>
-            <div class="flex items-center gap-4 text-sm">
-                <span class="text-gray-700 hidden sm:block">Hi, {{ user.name }}</span>
-                <a href="{{ url_for('cart.view_cart') }}"
-                    class="px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition">Cart</a>
-                <a href="{{ url_for('order.view_my_orders') }}"
-                    class="px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition">Orders</a>
-                <a href="{{ url_for('auth.logout') }}"
-                    class="px-4 py-2 rounded-lg bg-red-50 text-red-600 font-medium hover:bg-red-100 transition">Logout</a>
-            </div>
-        </div>
-    </nav>
+    <!-- Header -->
+    <header class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-6">
+                    <a href="{{ url_for('product.list_products') }}"
+                        class="text-2xl font-bold text-indigo-600">MyShop</a>
+                </div>
 
-    <!-- Category Filter Bar -->
-    <div class="bg-white shadow-sm py-4 mb-6 sticky top-[64px] z-40">
-        <div class="max-w-[1400px] mx-auto px-8 flex flex-wrap gap-3 overflow-x-auto scrollbar-none">
-            <a href="{{ url_for('product.list_products') }}"
-                class="px-5 py-2 rounded-full border font-semibold transition whitespace-nowrap {{ 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md' if not request.args.get('category') else 'bg-white border-gray-300 text-gray-700 hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white' }}">
-                All
-            </a>
-            {% for category in categories %}
-            <a href="{{ url_for('product.list_products', category=category.name) }}"
-                class="px-5 py-2 rounded-full border font-semibold transition whitespace-nowrap {{ 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md' if request.args.get('category') == category.name else 'bg-white border-gray-300 text-gray-700 hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white' }}">
-                {{ category.name }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
+                <div class="flex-1 px-4">
+                    <div class="max-w-2xl mx-auto">
+                        <form id="header-search-form" class="relative">
+                            <input id="search-input" name="q" value="{{ request.args.get('q', '') }}"
+                                placeholder="Search products, brands, categories"
+                                class="w-full border border-gray-200 rounded-full py-3 px-4 pl-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                            </svg>
+                        </form>
+                    </div>
+                </div>
 
-    <!-- Product Grid -->
-    <div
-        class="max-w-[1400px] mx-auto px-8 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-        {% for product in products %}
-        <div
-            class="bg-white rounded-3xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 hover:scale-105 transition flex flex-col overflow-hidden">
-
-            <!-- Product Image -->
-            {% if product.image_url %}
-            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="h-64 w-full object-cover rounded-t-3xl">
-            {% else %}
-            <div class="h-64 bg-gray-200 rounded-t-3xl flex items-center justify-center text-gray-400 text-lg">
-                No Image
-            </div>
-            {% endif %}
-
-            <!-- Product Info -->
-            <div class="p-6 flex flex-col flex-1">
-                <h3 class="font-bold text-xl text-gray-800 mb-1 truncate">{{ product.name }}</h3>
-                <p class="text-sm text-gray-500 mb-2 truncate">{{ product.category }}</p>
-                <p class="text-2xl text-blue-600 font-extrabold mb-3">$ {{ product.price }}</p>
-
-                {% if product.stock > 0 %}
-                <span class="text-sm text-green-600 font-semibold mb-4">In stock</span>
-                {% else %}
-                <span class="text-sm text-red-600 font-semibold mb-4">Out of stock</span>
-                {% endif %}
-
-                <div class="mt-auto flex flex-col gap-3">
-                    {% if product.stock > 0 %}
-                    <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}">
-                        <button type="submit"
-                            class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition">
-                            Add to Cart
-                        </button>
-                    </form>
-                    {% endif %}
-                    <a href="{{ url_for('product.view_product', product_id=product.id) }}"
-                        class="w-full text-center text-blue-600 hover:underline font-medium text-lg">
-                        View Details
+                <div class="flex items-center gap-4">
+                    <a href="{{ url_for('order.view_my_orders') }}"
+                        class="text-sm text-gray-600 hover:text-gray-800">Orders</a>
+                    <a href="{{ url_for('cart.view_cart') }}"
+                        class="relative inline-flex items-center px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                        Cart
+                        {% if session.get('cart_count') %}
+                        <span
+                            class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{{
+                            session.get('cart_count') }}</span>
+                        {% endif %}
                     </a>
+                    <div class="hidden sm:block text-sm text-gray-700">Hi, {{ user.name }}</div>
                 </div>
             </div>
         </div>
-        {% endfor %}
+    </header>
+
+    <!-- Main content: sidebar filters + products -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3 bg-white rounded-lg p-4 shadow-sm">
+                <h4 class="text-lg font-semibold mb-3">Filters</h4>
+
+                <div>
+                    <h5 class="text-sm font-medium text-gray-700 mb-2">Categories</h5>
+                    <div class="flex flex-col gap-2">
+                        <button type="button" data-category=""
+                            class="filter-cat text-left px-3 py-2 rounded-md bg-indigo-600 text-white">All</button>
+                        {% for category in categories %}
+                        <button type="button" data-category="{{ category.name }}"
+                            class="filter-cat text-left px-3 py-2 rounded-md bg-gray-100 text-gray-700">{{ category.name
+                            }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h5 class="text-sm font-medium text-gray-700 mb-2">Price</h5>
+                    <div class="flex gap-2">
+                        <input id="min-price" type="number" placeholder="Min"
+                            class="w-1/2 border border-gray-200 rounded-md py-2 px-3" />
+                        <input id="max-price" type="number" placeholder="Max"
+                            class="w-1/2 border border-gray-200 rounded-md py-2 px-3" />
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="inline-flex items-center gap-2">
+                        <input id="in-stock" type="checkbox" class="rounded"> <span class="text-sm">In stock only</span>
+                    </label>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <button id="apply-filters" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Apply</button>
+                    <button id="clear-filters" class="px-4 py-2 border rounded-md">Clear</button>
+                </div>
+            </aside>
+
+            <!-- Products area -->
+            <section class="lg:col-span-9">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="text-sm text-gray-600"><span id="results-count">{{ products|length }}</span> results
+                    </div>
+                    <div>
+                        <label class="sr-only">Sort</label>
+                        <select id="sort-select" class="border border-gray-200 rounded-md py-2 px-3">
+                            <option value="newest" {% if request.args.get('sort')=='newest' %}selected{% endif %}>Newest
+                            </option>
+                            <option value="price_asc" {% if request.args.get('sort')=='price_asc' %}selected{% endif %}>
+                                Price: Low to High</option>
+                            <option value="price_desc" {% if request.args.get('sort')=='price_desc' %}selected{% endif
+                                %}>Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                    {% for product in products %}
+                    <article class="bg-white rounded-lg shadow-sm overflow-hidden product-card"
+                        data-id="{{ product.id }}" data-name="{{ product.name|lower }}"
+                        data-category="{{ (product.category or '')|lower }}"
+                        data-description="{{ (product.description or '')|lower }}"
+                        data-price="{{ product.price|float }}">
+                        <div class="card-media bg-gray-100 flex items-center justify-center">
+                            {% if product.image_url %}
+                            <img loading="lazy" src="{{ product.image_url }}" alt="{{ product.name }}"
+                                class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="text-gray-400 py-12">No Image</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="p-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">{{ product.name }}</h3>
+                                    <div class="text-sm text-gray-500 truncate mt-1">{{ product.description or '' }}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500">ID: {{ product.id }}</div>
+                                    <div class="text-lg font-semibold text-indigo-600 mt-1">${{
+                                        "%.2f"|format(product.price|float) }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex gap-3">
+                                {% if product.stock > 0 %}
+                                <form method="POST" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}"
+                                    class="flex-1">
+                                    <button type="submit" class="w-full py-2 rounded-md bg-indigo-600 text-white">Add to
+                                        cart</button>
+                                </form>
+                                {% else %}
+                                <button disabled
+                                    class="w-full py-2 rounded-md bg-gray-200 text-gray-500">Unavailable</button>
+                                {% endif %}
+
+                                <a href="{{ url_for('product.view_product', product_id=product.id) }}"
+                                    class="px-4 py-2 border rounded-md text-sm">View</a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <!-- pagination placeholder -->
+                <div class="mt-8 flex justify-center">
+                    <nav class="inline-flex -space-x-px rounded-md shadow-sm">
+                        <a href="#" class="px-3 py-2 rounded-l-md border">Prev</a>
+                        <a href="#" class="px-3 py-2 border">1</a>
+                        <a href="#" class="px-3 py-2 border">2</a>
+                        <a href="#" class="px-3 py-2 border">Next</a>
+                    </nav>
+                </div>
+            </section>
+        </div>
     </div>
+
+    <footer class="mt-auto bg-white border-t">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-sm text-gray-600">© {{ current_year or "2026" }}
+            MyShop — Built with care.</div>
+    </footer>
+
+    <script>
+        // Client-side filtering & sorting adapted to the new layout
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('search-input');
+            const sortSelect = document.getElementById('sort-select');
+            const container = document.getElementById('products-grid');
+            let cards = Array.from(document.querySelectorAll('.product-card'));
+
+            const categoryButtons = Array.from(document.querySelectorAll('.filter-cat'));
+            const applyBtn = document.getElementById('apply-filters');
+            const clearBtn = document.getElementById('clear-filters');
+            const minPrice = document.getElementById('min-price');
+            const maxPrice = document.getElementById('max-price');
+            const inStock = document.getElementById('in-stock');
+            const resultsCount = document.getElementById('results-count');
+
+            let activeCategory = ("{{ request.args.get('category','')|e }}" || '').toLowerCase();
+
+            function setActiveCategory(cat) {
+                categoryButtons.forEach(btn => {
+                    const btnCat = (btn.dataset.category || '').toLowerCase();
+                    if (btnCat === (cat || '').toLowerCase()) {
+                        btn.classList.remove('bg-gray-100', 'text-gray-700');
+                        btn.classList.add('bg-indigo-600', 'text-white');
+                    } else {
+                        btn.classList.add('bg-gray-100', 'text-gray-700');
+                        btn.classList.remove('bg-indigo-600', 'text-white');
+                    }
+                });
+            }
+
+            function applyFilters() {
+                const q = (searchInput && searchInput.value || '').trim().toLowerCase();
+                const min = parseFloat(minPrice && minPrice.value ? minPrice.value : NaN);
+                const max = parseFloat(maxPrice && maxPrice.value ? maxPrice.value : NaN);
+                const stockOnly = inStock && inStock.checked;
+
+                let visibleCount = 0;
+                cards.forEach(card => {
+                    const name = (card.dataset.name || '');
+                    const cat = (card.dataset.category || '');
+                    const desc = (card.dataset.description || '');
+                    const price = parseFloat(card.dataset.price || 0);
+                    const stock = card.querySelector && card.querySelector('form') ? true : false;
+                    let visible = true;
+
+                    if (activeCategory && activeCategory !== '') if (cat !== activeCategory) visible = false;
+                    if (visible && q) visible = name.includes(q) || desc.includes(q) || cat.includes(q);
+                    if (visible && !Number.isNaN(min)) if (price < min) visible = false;
+                    if (visible && !Number.isNaN(max)) if (price > max) visible = false;
+                    if (visible && stockOnly) if (!stock) visible = false;
+
+                    card.style.display = visible ? '' : 'none';
+                    if (visible) visibleCount++;
+                });
+
+                // sort visible
+                const sel = sortSelect && sortSelect.value || 'newest';
+                const visibleCards = Array.from(container.querySelectorAll('.product-card')).filter(c => c.style.display !== 'none');
+                let sorted = visibleCards.slice();
+                if (sel === 'price_asc') sorted.sort((a, b) => parseFloat(a.dataset.price || 0) - parseFloat(b.dataset.price || 0));
+                else if (sel === 'price_desc') sorted.sort((a, b) => parseFloat(b.dataset.price || 0) - parseFloat(a.dataset.price || 0));
+                else if (sel === 'newest') sorted.sort((a, b) => (parseInt(b.dataset.id || 0) - parseInt(a.dataset.id || 0)));
+                sorted.forEach(c => container.appendChild(c));
+
+                if (resultsCount) resultsCount.textContent = visibleCount;
+            }
+
+            categoryButtons.forEach(btn => btn.addEventListener('click', function () {
+                activeCategory = (this.dataset.category || '').toLowerCase();
+                setActiveCategory(activeCategory);
+                applyFilters();
+            }));
+
+            if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+            if (clearBtn) clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                minPrice.value = '';
+                maxPrice.value = '';
+                inStock.checked = false;
+                activeCategory = '';
+                setActiveCategory(activeCategory);
+                if (sortSelect) sortSelect.value = 'newest';
+                applyFilters();
+            });
+
+            if (searchInput) {
+                let t;
+                searchInput.addEventListener('input', function () { clearTimeout(t); t = setTimeout(applyFilters, 150); });
+            }
+            if (sortSelect) sortSelect.addEventListener('change', applyFilters);
+
+            // init
+            setActiveCategory(activeCategory);
+            applyFilters();
+        });
+    </script>
 
 </body>
 
