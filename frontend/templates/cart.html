@@ -67,12 +67,10 @@
             <p class="text-2xl font-bold text-gray-800">Total: ${{ total_price }}</p>
 
             <div class="flex gap-2 flex-wrap">
-                <form method="POST" action="{{ url_for('order.place_order') }}">
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-6 py-2 rounded-xl hover:bg-blue-600 font-medium transition">
-                        Place Order
-                    </button>
-                </form>
+                <a href="{{ url_for('order.payment') }}"
+                    class="bg-blue-500 text-white px-6 py-2 rounded-xl hover:bg-blue-600 font-medium transition">
+                    Proceed to Payment
+                </a>
 
                 <a href="{{ url_for('dashboard') }}"
                     class="bg-gray-300 text-gray-700 px-6 py-2 rounded-xl hover:bg-gray-400 font-medium transition">

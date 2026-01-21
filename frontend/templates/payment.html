@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Payment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+
+    <div class="max-w-3xl w-full bg-white rounded-2xl shadow-lg p-8">
+
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            Secure Payment
+        </h1>
+
+        <!-- Order Summary -->
+        <div class="mb-6 border rounded-xl p-4">
+            <h2 class="text-xl font-semibold mb-3 text-gray-700">Order Summary</h2>
+
+            {% for item in cart %}
+            <div class="flex justify-between text-gray-600 mb-2">
+                <span>{{ item.product_name }} × {{ item.quantity }}</span>
+                <span>${{ (item.price * item.quantity)|round(2) }}</span>
+            </div>
+            {% endfor %}
+
+            <hr class="my-3">
+
+            <div class="flex justify-between text-lg font-bold text-gray-800">
+                <span>Total</span>
+                <span>${{ total_price }}</span>
+            </div>
+        </div>
+
+        <!-- Payment Options -->
+        <form method="POST" action="{{ url_for('order.place_order') }}">
+
+            <h2 class="text-xl font-semibold mb-3 text-gray-700">
+                Select Payment Method
+            </h2>
+
+            <div class="space-y-3 mb-6">
+
+                <!-- COD -->
+                <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="payment" value="cod" checked onclick="toggleCard(false)">
+                    <span class="font-medium text-gray-700">Cash on Delivery</span>
+                </label>
+
+                <!-- CARD -->
+                <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-gray-50">
+                    <input type="radio" name="payment" value="card" onclick="toggleCard(true)">
+                    <span class="font-medium text-gray-700">Credit / Debit Card</span>
+                </label>
+
+            </div>
+
+            <!-- Card Form -->
+            <div id="cardBox" class="hidden border rounded-xl p-4 mb-6 bg-gray-50">
+
+                <h3 class="font-semibold mb-3 text-gray-700">Card Details</h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Card Holder Name" class="border rounded-lg px-3 py-2 w-full">
+
+                    <input type="text" placeholder="Card Number" class="border rounded-lg px-3 py-2 w-full">
+
+                    <input type="text" placeholder="MM/YY" class="border rounded-lg px-3 py-2 w-full">
+
+                    <input type="text" placeholder="CVV" class="border rounded-lg px-3 py-2 w-full">
+                </div>
+
+                <p class="text-sm text-gray-500 mt-2">
+                    * This is a demo. No data is stored.
+                </p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-between items-center gap-4">
+
+                <a href="{{ url_for('cart.view_cart') }}" class="text-gray-600 hover:underline">
+                    ← Back to Cart
+                </a>
+
+                <button type="submit"
+                    class="bg-green-500 text-white px-8 py-3 rounded-xl hover:bg-green-600 transition font-semibold">
+                    Place Order
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script>
+        function toggleCard(show) {
+            document.getElementById("cardBox").classList.toggle("hidden", !show);
+        }
+    </script>
+
+</body>
+
+</html>
