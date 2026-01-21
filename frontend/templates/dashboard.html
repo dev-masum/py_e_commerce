@@ -47,16 +47,29 @@
                 <div class="flex items-center gap-4">
                     <a href="{{ url_for('order.view_my_orders') }}"
                         class="text-sm text-gray-600 hover:text-gray-800">Orders</a>
+
                     <a href="{{ url_for('cart.view_cart') }}"
                         class="relative inline-flex items-center px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-50">
                         Cart
                         {% if session.get('cart_count') %}
                         <span
-                            class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{{
-                            session.get('cart_count') }}</span>
+                            class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                            {{ session.get('cart_count') }}
+                        </span>
                         {% endif %}
                     </a>
-                    <div class="hidden sm:block text-sm text-gray-700">Hi, {{ user.name }}</div>
+
+                    <div class="hidden sm:block text-sm text-gray-700">
+                        Hi, {{ session['user']['name'] if session.get('user') else 'Guest' }}
+                    </div>
+
+                    <!-- Logout -->
+                    {% if session.get('user') %}
+                    <a href="{{ url_for('auth.logout') }}"
+                        class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600">
+                        Logout
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
